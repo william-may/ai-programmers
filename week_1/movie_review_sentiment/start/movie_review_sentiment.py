@@ -31,7 +31,7 @@ def analyze_sentiment(review):
     review_analysis = content.strip().split('sentiment:')
     result = {
         "thought": review_analysis[0].replace("thought:", "").strip(),
-        "sentiment": review_analysis[1]
+        "sentiment": review_analysis[1].strip().strip('"')
     }
     
     return result
