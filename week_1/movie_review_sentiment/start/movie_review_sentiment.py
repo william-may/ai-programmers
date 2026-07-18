@@ -8,14 +8,16 @@ def analyze_sentiment(review):
     Analyze the sentiment of a movie review using structured output.
     Returns a dictionary with 'thought' and 'sentiment' keys.
     """
-    # TODO: Create a prompt that:
-    # 1. Asks for sentiment analysis
-    # 2. Specifies the required output format
-    #       thought: [analysis]
-    #       sentiment: [positive/negative]
-    # 3. Includes the review text
-    prompt = """
-    # TODO: Add your prompt here
+
+    prompt = f"""
+    You are a data analyst specializing in sentiment analysis. 
+    Classify the following movie review as one of the following: positive, negative, or mixed.
+
+    Review: {review}
+
+    The final response should be in the following format:
+    thought: analyze the review to determine if it's positive, negative, or mixed
+    sentiment: "positive", "negative", or "mixed"
     """
 
     response = client.chat.completions.create(
@@ -25,13 +27,11 @@ def analyze_sentiment(review):
     )
 
     content = response.choices[0].message.content
-    # TODO: Parse the response to extract thought and sentiment
-    # The response should be in the format:
-    # thought: [analysis]
-    # sentiment: [positive/negative]
+    
+    review_analysis = content.strip().split('sentiment:')
     result = {
-        "thought": "",  # TODO: Extract thought
-        "sentiment": ""  # TODO: Extract sentiment
+        "thought": review_analysis[0].replace("thought:", "").strip(),
+        "sentiment": review_analysis[1]
     }
     
     return result
