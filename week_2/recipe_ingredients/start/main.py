@@ -1,6 +1,6 @@
 from openai import OpenAI
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 from pprint import pprint
 import os
 
@@ -8,13 +8,17 @@ import os
 # - amount
 # - unit
 # - name
+class Ingredient(BaseModel):
+    amount: Optional[float] = Field(description="Quantity of the ingredient")
+    unit: Optional[str] = Field(description="Unit of measurement (e.g., cup, tbsp, oz)")
+    name: str = Field(description="Name of the ingredient")
 
 class Recipe(BaseModel):
     """
     Use this model when working with complete cooking recipes.
     """
     title: str = Field(description="Name of the recipe")
-    ingredients: List[str] = Field(description="List of ingredients needed for the recipe")
+    ingredients: List[Ingredient] = Field(description="List of ingredients needed for the recipe")
     instructions: List[str] = Field(description="Step-by-step instructions to prepare the recipe")
 
 def get_recipe_from_text(recipe_text: str) -> Recipe:
@@ -47,5 +51,4 @@ if __name__ == "__main__":
     recipe = get_recipe_from_text(recipe_text)
     
     # Print results
-    pprint(recipe.ingredients[0])
-    # pprint(recipe) # to see the whole object
+    pprint(recipe)
