@@ -10,11 +10,12 @@ texts = [
 ]
 
 def get_embedding(text):
-    # TODO: Implement the OpenAI embedding functionality
-    # Documentation: https://platform.openai.com/docs/guides/embeddings
-    # 1. Create an OpenAI client
-    # 2. Make an API call to generate embeddings using the text-embedding-3-small model
-    # 3. Return the embedding vector from the response
+    client = OpenAI()
+    response = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text
+    )
+    return response.data[0].embedding
     
     # Placeholder for the actual implementation
     return [0] * 1536  # Placeholder with the expected dimension
@@ -36,5 +37,5 @@ query_embedding = get_embedding(query)
 distances, indicies = index.search(numpy.array([query_embedding], dtype='float32'), 3)
 
 for i in range(3):
-    # print(f"Match {i+1}, Distance: {distances[0][i]:.f4}")
+    print(f"Match {i+1}, Distance: {distances[0][i]:.4f}")
     print(texts[indicies[0][i]]) 

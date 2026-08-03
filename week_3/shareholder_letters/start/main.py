@@ -9,7 +9,7 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
 
 # Constants
-INDEX_NAME = "YOUR INDEX HERE"
+INDEX_NAME = "test"
 EMBEDDING_MODEL = "text-embedding-3-small"
 CHAT_MODEL = "gpt-4o-mini-2024-07-18"
 
@@ -17,11 +17,13 @@ def load_documents():
     """Load all text documents from the letters directory."""
     documents = []
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    print(script_dir)
     path = os.path.join(script_dir, "letters/*.txt")
     files = glob.glob(path)
     
     for file_path in files:
-        with open(file_path, 'r') as file:
+        print(file_path)
+        with open(file_path, 'r', encoding='utf-8') as file:
             content = file.read()
             documents.append({"content": content, "metadata": {"source": file_path}})
     
@@ -90,16 +92,24 @@ def search_documents(query, namespace, top_k=5):
     # Get query embedding
     query_embedding = get_embeddings([query])[0]
     
-    # TODO: Search Pinecone using the query_embedding
-    # Implement the search functionality using the Pinecone Index query method
-    # Documentation: https://sdk.pinecone.io/python/pinecone/grpc.html#GRPCIndex.query
-    # The query should:
-    # 1. Get a reference to the index
-    # 2. Call the query method with the appropriate parameters
-    # 3. Process the results to extract the documents
+    # Search Pinecone
+    index = pc.Index(INDEX_NAME)
+    results = index.query(
+        vector=query_embedding,
+        top_k=top_k,
+        namespace=namespace,
+        include_metadata=True,
+        include_values=False
+    )
     
-    # Placeholder for the actual implementation
+    # Get matched documents
     docs_with_scores = []
+    for match in results["matches"]:
+        # Load the document content based on the source file
+        with open(match["metadata"]["source"], 'r', encoding='utf-8') as f:
+            content = f.read()
+        docs_with_scores.append((content, match["score"]))
+    
     return docs_with_scores
 
 def ask_openai(query, documents):
